@@ -13,12 +13,10 @@ const typeDefs = readFileSync(schemaPath, 'utf8');
 const { PORT } = process.env;
 const ENABLE_INSTROSPECTION = process.env.NODE_ENV !== 'production';
 
-// move to server and user server.start();
 const server = new ApolloServer({
   typeDefs: gql(typeDefs),
   resolvers,
   introspection: ENABLE_INSTROSPECTION,
-
 });
 
 (async function main() {
