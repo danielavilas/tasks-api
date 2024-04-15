@@ -1,12 +1,13 @@
 import { GraphQLError } from 'graphql';
 import { AppDataSource } from '../data-source';
-import { Task, TaskPermission } from '../entities';
+import { Task, TaskHistory, TaskPermission, TaskState } from '../entities';
 
 export class UpdateTaskService {
   async execute(id: number, data: Partial<Task>, userId: number): Promise<Task | null> {
     try {
       const taskRepository = AppDataSource.getRepository(Task);
       const taskPermissionRepository = AppDataSource.getRepository(TaskPermission);
+      const taskHistoryRepository = AppDataSource.getRepository(TaskHistory);
 
       const [task, taskPermission] = await Promise.all([
         taskRepository.findOneBy({ id }),
@@ -36,19 +37,42 @@ export class UpdateTaskService {
         });
       }
 
-      if (data.title) {
+      const previousState: TaskState = Object.assign({}, {
+        status: task.status,
+        title: task.title,
+        description: task.description,
+      });
+      let hasUpdated = false;
+
+      if (data.title && data.title !== task.title) {
         task.title = data.title;
+        hasUpdated = true;
       }
 
-      if (data.description) {
+      if (data.description && data.description !== task.description) {
         task.description = data.description;
+        hasUpdated = true;
       }
 
-      if (data.status) {
+      if (data.status && data.status !== task.status) {
         task.status = data.status;
+        hasUpdated = true;
       }
 
-      await taskRepository.save(task);
+      if (hasUpdated) {
+        await taskRepository.save(task);
+
+        const history = new TaskHistory();
+        history.taskId = task.id;
+        history.userId = userId;
+        history.previousState = previousState;
+        history.newState = {
+          title: task.title,
+          description: task.description,
+          status: task.status,
+        };
+        await taskHistoryRepository.save(history);
+      }
 
       return task;
     } catch (error) {

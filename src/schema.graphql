@@ -15,6 +15,7 @@ type Task {
   title: String!
   description: String!
   status: TaskStatus!
+  taskHistory: [TaskHistory]!
 }
 
 type TaskList {
@@ -25,6 +26,21 @@ type TaskList {
   tasks: [Task]!
 }
 
+type TaskState {
+  title: String!
+  description: String!
+  status: TaskStatus!
+}
+
+type TaskHistory {
+  id: Int!
+  taskId: Int!
+  userId: Int!
+  newState: TaskState!
+  previousState: TaskState!
+  createdAt: String!
+}
+
 type LoginResponse {
   accessToken: String!
 }
@@ -32,6 +48,7 @@ type LoginResponse {
 # QUERY
 type Query {
   task(id: Int!): Task
+  taskHistory(id: Int!): [TaskHistory]!
   tasks(page: Int = 1, itemsPerPage: Int = 10, statuses: [TaskStatus] = []): TaskList!
 }
 

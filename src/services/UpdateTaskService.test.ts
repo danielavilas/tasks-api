@@ -1,6 +1,6 @@
-import { UpdateTaskService } from './UpdateTaskService';
-import { Task, TaskPermission, TaskStatus } from '../entities';
 import { GraphQLError } from 'graphql';
+import { UpdateTaskService } from './UpdateTaskService';
+import { Task, TaskPermission, TaskStatus, TaskHistory } from '../entities';
 import { AppDataSource } from '../data-source';
 
 describe('UpdateTaskService', () => {
@@ -25,9 +25,14 @@ describe('UpdateTaskService', () => {
       findOne: jest.fn().mockResolvedValue(mockTaskPermission),
     };
 
+    const mockTaskHistoryRepository = {
+      save: jest.fn().mockResolvedValue(new TaskHistory()),
+    };
+
     jest.spyOn(AppDataSource, 'getRepository')
       .mockReturnValueOnce(mockTaskRepository as any)
-      .mockReturnValueOnce(mockTaskPermissionRepository as any);
+      .mockReturnValueOnce(mockTaskPermissionRepository as any)
+      .mockReturnValueOnce(mockTaskHistoryRepository as any);
 
     const service = new UpdateTaskService();
 
@@ -47,6 +52,7 @@ describe('UpdateTaskService', () => {
       description: 'Mock Task Description',
       status: TaskStatus.TODO,
     }));
+    expect(mockTaskHistoryRepository.save).toHaveBeenCalled();
   });
 
   it('should throw error if user does not have permission', async () => {
@@ -59,6 +65,24 @@ describe('UpdateTaskService', () => {
 
     const mockTaskPermissionRepository = {
       findOne: jest.fn().mockResolvedValue(null),
+    };
+
+    jest.spyOn(AppDataSource, 'getRepository')
+      .mockReturnValueOnce(mockTaskRepository as any)
+      .mockReturnValueOnce(mockTaskPermissionRepository as any);
+
+    const service = new UpdateTaskService();
+
+    await expect(service.execute(1, { title: 'Updated Task' }, 1)).rejects.toThrow(GraphQLError);
+  });
+
+  it('should throw error if task not found', async () => {
+    const mockTaskRepository = {
+      findOneBy: jest.fn().mockResolvedValue(null),
+    };
+
+    const mockTaskPermissionRepository = {
+      findOne: jest.fn().mockResolvedValue(new TaskPermission()), // Simulate TaskPermission found
     };
 
     jest.spyOn(AppDataSource, 'getRepository')

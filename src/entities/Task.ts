@@ -6,6 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { TaskPermission } from './TaskPermission';
+import { TaskHistory } from './TaskHistory';
 
 export enum TaskStatus {
   TODO = 'TODO',
@@ -36,4 +37,7 @@ export class Task {
 
   @OneToMany(() => TaskPermission, taskPermission => taskPermission.task)
   taskPermissions: TaskPermission[];
+
+  @OneToMany(() => TaskHistory, taskHistory => taskHistory.task)
+  taskHistory: TaskHistory[];
 }

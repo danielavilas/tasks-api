@@ -3,6 +3,7 @@ import { GetTaskService } from '../services/GetTaskService';
 import { TaskStatus } from '../entities';
 import { GetTasksService } from '../services/GetTasksService';
 import { UpdateTaskService } from '../services/UpdateTaskService';
+import { GetTaskHistoryService } from '../services/GetTaskHistoryService';
 
 const handleError = (error: unknown) => {
   if (!(error instanceof GraphQLError)) {
@@ -19,24 +20,47 @@ const handleError = (error: unknown) => {
   throw error;
 }
 
+const throwAuthError = () => {
+  throw new GraphQLError('User is not authenticated', {
+    extensions: {
+      code: 'UNAUTHENTICATED',
+      http: { status: 401 },
+    },
+  });
+}
+
+const taskHistoryResolver = async (_, { id }: { id: number }, { userId }) => {
+  try {
+    if (!userId) {
+      throwAuthError();
+    }
+
+    const getTaskHistoryService = new GetTaskHistoryService();
+
+    const result = await getTaskHistoryService.execute(id, userId);
+
+    return result;
+  } catch (error) {
+    handleError(error);
+  }
+}
+
 export const taskResolvers = {
   Query: {
     task: async (_, { id }: { id: number }, { userId }) => {
       try {
         if (!userId) {
-          throw new GraphQLError('User is not authenticated', {
-            extensions: {
-              code: 'UNAUTHENTICATED',
-              http: { status: 401 },  
-            },
-          });
+          throwAuthError();
         }
 
         const getTaskService = new GetTaskService();
 
         const result = await getTaskService.execute(id, userId);
 
-        return result;
+        return {
+          ...result,
+          taskHistory: taskHistoryResolver(_, { id }, { userId }),
+        };
       } catch (error) {
         handleError(error);
       }
@@ -52,12 +76,7 @@ export const taskResolvers = {
     }, { userId }) => {
       try {
         if (!userId) {
-          throw new GraphQLError('User is not authenticated', {
-            extensions: {
-              code: 'UNAUTHENTICATED',
-              http: { status: 401 },  
-            },
-          });
+          throwAuthError();
         }
 
         if (page <= 0 || itemsPerPage <= 0) {
@@ -68,7 +87,13 @@ export const taskResolvers = {
 
         const result = await getTasksService.execute(userId, page,itemsPerPage, statuses);
 
-        return result;
+        return {
+          ...result,
+          tasks: result.tasks.map((task) => ({
+            ...task,
+            taskHistory: taskHistoryResolver(_, { id: task.id }, { userId }),
+          }))
+        };
       } catch (error) {
         handleError(error);
       }
@@ -95,7 +120,10 @@ export const taskResolvers = {
           description,
         }, userId);
   
-        return task;
+        return {
+          ...task,
+          taskHistory: taskHistoryResolver(_, { id }, { userId }),
+        };
       } catch (error) {
         handleError(error);
       }
