@@ -41,7 +41,7 @@ describe('CreateLoginService', () => {
     const accessToken = await service.execute('testuser', 'password');
 
     expect(bcrypt.compare).toHaveBeenCalledWith('password', 'hashedpassword');
-    expect(jwt.sign).toHaveBeenCalledWith({ userId: 1 }, 'jest-secret', { expiresIn: '1h' });
+    expect(jwt.sign).toHaveBeenCalledWith({ userId: 1 }, 'jest-secret', { expiresIn: '24h' });
 
     expect(accessToken).toBe('mocked_token');
   });

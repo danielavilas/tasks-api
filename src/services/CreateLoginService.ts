@@ -5,7 +5,7 @@ import { AppDataSource } from '../data-source';
 import { GraphQLError } from 'graphql';
 
 const SECRET_KEY = process.env.AUTH_SECRET_KEY as string;
-const EXPIRES_IN = '1h';
+const EXPIRES_IN = '24h';
 
 export class CreateLoginService {
   async execute(username: string, password: string): Promise<any> {
