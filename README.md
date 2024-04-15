@@ -1,6 +1,8 @@
 # Task API
 
-Welcome to the Task API, a simple application for managing tasks with different states. This README will guide you through setting up and using the API.
+Welcome to the Task API! This API is currently in development and continuous improvement. Our primary focus here is to showcase the resolvers responsible for visualizing tasks for authenticated users who have the necessary permissions.
+
+This README will guide you through setting up and using the API.
 
 ## Table of Contents
 
