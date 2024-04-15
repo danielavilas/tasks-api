@@ -1,0 +1,37 @@
+{
+  "name": "task-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && cp src/schema.graphql dist/",
+    "start:dev": "npm run build && node ./dist/index.js --env-file=.env",
+    "start": "npm run build && node ./dist/index.js",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "Daniel Avila",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jest": "^29.5.12",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.12.6",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.4"
+  },
+  "description": "GraphQL api for tasks",
+  "type": "commonjs",
+  "dependencies": {
+    "@apollo/server": "^4.10.2",
+    "bcryptjs": "^2.4.3",
+    "graphql": "^16.8.1",
+    "graphql-tag": "^2.12.6",
+    "install": "^0.13.0",
+    "jsonwebtoken": "^9.0.2",
+    "npm": "^10.5.2",
+    "pg": "^8.11.5",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20"
+  }
+}

@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - '3000:3000'
+    volumes:
+      - /usr/src/app/node_modules
+    command: npm run start
+    environment:
+      PORT: 3000
+      AUTH_SECRET_KEY: SOME_SECRET_KEY
+  postgres:
+    image: postgres:16.2
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: tasksdb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

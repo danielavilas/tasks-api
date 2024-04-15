@@ -1,0 +1,41 @@
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  ARCHIVED
+}
+
+type User {
+  id: Int!
+  username: String!
+}
+
+type Task {
+  id: Int!
+  title: String!
+  description: String!
+  status: TaskStatus!
+}
+
+type TaskList {
+  page: Int!
+  itemsPerPage: Int!
+  totalItems: Int!
+  totalPages: Int!
+  tasks: [Task]!
+}
+
+type LoginResponse {
+  accessToken: String!
+}
+
+# QUERY
+type Query {
+  task(id: Int!): Task
+  tasks(page: Int = 1, itemsPerPage: Int = 10, statuses: [TaskStatus] = []): TaskList!
+}
+
+# MUTATION
+type Mutation {
+  login(username: String!, password: String!): LoginResponse!
+}
