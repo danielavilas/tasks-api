@@ -49,6 +49,16 @@ To run the Task API using Docker Compose:
 4. The migrations will create 10 tasks and 2 users with the same password for tests (Test123!):
    - daniel (has access to all 10 tasks)
    - avila (has access to all DONE tasks)
+   - To authenticate a user and obtain an access token, use the following mutation:
+```graphql
+mutation Login($username: String!, $password: String!) {
+  login(username: $username, password: $password) {
+    accessToken
+  }
+}
+```
+   - Use `Authorization: YOUR_ACCESS_TOKEN` to access queries and mutations
+
 5. The postgres DB will be available at `5432` with user `admin` and password `admin`
 
 ## Testing
